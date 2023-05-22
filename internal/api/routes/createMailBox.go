@@ -21,6 +21,16 @@ func CreateMailBox(c *gin.Context) {
 		return
 	}
 
+	if len(data.Password) > 16 {
+		utils.DefaultResponse(c, 400, "password too long")
+		return
+	}
+
+	if len(data.Email) > 64 {
+		utils.DefaultResponse(c, 400, "email too long")
+		return
+	}
+
 	query, err := database.DB.Query("SELECT * FROM mailbox WHERE email=$email", map[string]any{"email": data.Email})
 	if err != nil {
 		utils.DefaultResponse(c, 500)
