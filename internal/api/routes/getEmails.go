@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"tidal.lol/internal/database"
 	"tidal.lol/internal/utils"
@@ -16,13 +15,12 @@ func GetEmails(c *gin.Context) {
 
 	query, err := database.DB.Query("SELECT * FROM mailbox WHERE token=$authorizationToken", map[string]any{"authorizationToken": token})
 	if err != nil {
-		fmt.Println(err)
 		utils.DefaultResponse(c, 500)
 		return
 	}
 
 	if len(query.([]interface{})[0].(map[string]interface{})["result"].([]interface{})) == 0 {
-		utils.DefaultResponse(c, 400)
+		utils.DefaultResponse(c, 400, "mailbox not found")
 		return
 	}
 
