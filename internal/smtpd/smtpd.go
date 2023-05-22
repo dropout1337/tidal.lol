@@ -42,7 +42,7 @@ func Parse(from string, to []string, d []byte) (*Email, error) {
 	return &Email{
 		UniqueID: uuid.NewString(),
 
-		To:   to,
+		To:   to[0],
 		From: from,
 
 		Date:    time.Now().Format(time.RFC3339),

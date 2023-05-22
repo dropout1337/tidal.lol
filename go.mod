@@ -9,7 +9,7 @@ require (
 	github.com/jhillyerd/enmime v0.11.1
 	github.com/mhale/smtpd v0.8.0
 	github.com/rs/zerolog v1.29.1
-	golang.org/x/exp v0.0.0-20230519143937-03e91628a987
+	github.com/surrealdb/surrealdb.go v0.2.1
 )
 
 require (
@@ -23,6 +23,8 @@ require (
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
 	github.com/gogs/chardet v0.0.0-20191104214054-4b6791f73a28 // indirect
+	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20200412013138-3577fbdbcff7 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect

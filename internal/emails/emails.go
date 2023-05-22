@@ -20,10 +20,8 @@ func Get(address string) []smtpd.Email {
 
 	var emails []smtpd.Email
 	for _, email := range Emails {
-		for _, to := range email.To {
-			if to == address {
-				emails = append(emails, email)
-			}
+		if email.To == address {
+			emails = append(emails, email)
 		}
 	}
 

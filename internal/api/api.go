@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"tidal.lol/internal/api/routes"
 	"tidal.lol/internal/logging"
+	"tidal.lol/internal/utils"
 	"time"
 )
 
@@ -19,15 +20,15 @@ func NewServer(port int, debug bool) error {
 	router.RemoveExtraSlash = true
 
 	router.NoRoute(func(c *gin.Context) {
-		c.AbortWithStatusJSON(404, gin.H{"code": 404, "message": "404: Not Found"})
+		utils.DefaultResponse(c, 404)
 	})
 
 	router.NoMethod(func(c *gin.Context) {
-		c.AbortWithStatusJSON(405, gin.H{"code": 405, "message": "405: Method not allowed"})
+		utils.DefaultResponse(c, 405)
 	})
 
 	router.Use(ginRecovery.Recovery(func(c *gin.Context, serverErr interface{}) {
-		c.AbortWithStatusJSON(500, gin.H{"code": 500, "message": "500: Internal server error"})
+		utils.DefaultResponse(c, 500)
 	}))
 
 	if debug {
@@ -46,7 +47,13 @@ func NewServer(port int, debug bool) error {
 	}
 
 	v1 := router.Group("/api/v1")
-	v1.Any("/emails/:email", routes.GetEmails)
+	v1.Any("/emails/:email", routes.GetTempEmails)
+
+	v2 := router.Group("/api/v2")
+
+	v2.POST("/emails/create", routes.CreateMailBox)
+	v2.DELETE("/emails/delete", routes.DeleteMailBox)
+	v2.GET("/emails/inbox", routes.GetEmails)
 
 	err := router.Run(fmt.Sprintf("0.0.0.0:%v", port))
 	if err != nil {

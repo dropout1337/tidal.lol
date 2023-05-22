@@ -2,6 +2,7 @@ package main
 
 import (
 	"tidal.lol/internal/api"
+	"tidal.lol/internal/database"
 	"tidal.lol/internal/emails"
 	"tidal.lol/internal/logging"
 	"tidal.lol/internal/smtpd"
@@ -15,9 +16,16 @@ var (
 	// httpPort to listen on
 	httpPort  = 80
 	httpDebug = true
+
+	// databaseURL, databaseUsername, and databasePassword are used to connect to the database
+	databaseURL      = "ws://localhost:8000/rpc"
+	databaseUsername = "root"
+	databasePassword = "root"
 )
 
 func main() {
+	database.DB = database.NewDatabase(databaseURL, databaseUsername, databasePassword)
+
 	go func() {
 		logging.Logger.Info().
 			Int("port", smtpPort).

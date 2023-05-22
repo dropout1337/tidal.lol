@@ -4,30 +4,40 @@ import (
 	"github.com/gin-gonic/gin"
 	"regexp"
 	"strings"
+	"tidal.lol/internal/database"
 	"tidal.lol/internal/emails"
 	"tidal.lol/internal/smtpd"
+	"tidal.lol/internal/utils"
 )
 
-// GetEmails returns a list of emails based on the provided email address or regex pattern or wildcard.
-func GetEmails(c *gin.Context) {
+// GetTempEmails returns a list of emails based on the provided email address or regex pattern or wildcard.
+func GetTempEmails(c *gin.Context) {
 	var emailList []smtpd.Email
 	address := c.Param("email")
+
+	// Check if the email address has been registered using the v2 api.
+	query, err := database.DB.Query("SELECT * FROM mailbox WHERE email=$email", map[string]any{"email": address})
+	if err != nil {
+		utils.DefaultResponse(c, 500)
+		return
+	}
+
+	if len(query.([]interface{})[0].(map[string]interface{})["result"].([]interface{})) != 0 {
+		utils.DefaultResponse(c, 403, "this email address has been registered using the v2 api")
+		return
+	}
 
 	// If the address starts with a wildcard, return all emails that match the domain.
 	if strings.HasPrefix(address, "*") {
 		for _, email := range emails.Emails {
-			for _, to := range email.To {
-				if strings.Split(to, "@")[1] == strings.Split(address, "@")[1] {
-					emailList = append(emailList, email)
-				}
+			if strings.Split(email.To, "@")[1] == strings.Split(address, "@")[1] {
+				emailList = append(emailList, email)
 			}
 		}
 	} else if r, err := regexp.Compile(address); err == nil { // If the address is a regex pattern, return all emails that match the pattern.
 		for _, email := range emails.Emails {
-			for _, to := range email.To {
-				if r.MatchString(to) {
-					emailList = append(emailList, email)
-				}
+			if r.MatchString(email.To) {
+				emailList = append(emailList, email)
 			}
 		}
 	} else if regexp.MustCompile(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$`).MatchString(address) { // If the address is a valid email address, return all emails that match the address.
