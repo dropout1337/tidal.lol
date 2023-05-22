@@ -6,6 +6,7 @@ import (
 	"tidal.lol/internal/utils"
 )
 
+// GetEmails returns all emails for a mailbox.
 func GetEmails(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	if token == "" {
