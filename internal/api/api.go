@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	ginRecovery "github.com/LaysDragon/gin-custom-recovery-handler"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"tidal.lol/internal/api/routes"
 	"tidal.lol/internal/logging"
@@ -45,6 +46,8 @@ func NewServer(port int, debug bool) error {
 				Msg("Request received")
 		})
 	}
+
+	router.Use(cors.Default())
 
 	v1 := router.Group("/api/v1")
 	v1.Any("/emails/:email", routes.GetTempEmails)
