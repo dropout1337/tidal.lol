@@ -14,7 +14,7 @@ import (
 // NewServer creates a new SMTP listener
 func NewServer(port int, handler func(origin net.Addr, from string, to []string, data []byte) error) error {
 	server := &smtpd.Server{
-		Appname: "tidal",
+		Appname: "Postfix (Ubuntu)", // Avoid tempmail detection?
 		Addr:    fmt.Sprintf("0.0.0.0:%v", port),
 
 		Handler: handler,
