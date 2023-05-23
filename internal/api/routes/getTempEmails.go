@@ -18,12 +18,13 @@ func GetTempEmails(c *gin.Context) {
 	// Check if the email address has been registered using the v2 api.
 	query, err := database.DB.Query("SELECT * FROM mailbox WHERE email=$email", map[string]any{"email": address})
 	if err != nil {
-		utils.DefaultResponse(c, 500)
+		utils.HTTPResponse(c, 500)
 		return
 	}
+	result := utils.ToJson(query)
 
-	if len(query.([]interface{})[0].(map[string]interface{})["result"].([]interface{})) != 0 {
-		utils.DefaultResponse(c, 403, "this email address has been registered using the v2 api")
+	if len(result.Get("0.result").Array()) != 0 {
+		utils.HTTPResponse(c, 403, "this email address has been registered using the v2 api")
 		return
 	}
 

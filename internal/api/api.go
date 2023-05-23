@@ -20,15 +20,15 @@ func NewServer(port int, debug bool) error {
 	router.RemoveExtraSlash = true
 
 	router.NoRoute(func(c *gin.Context) {
-		utils.DefaultResponse(c, 404)
+		utils.HTTPResponse(c, 404)
 	})
 
 	router.NoMethod(func(c *gin.Context) {
-		utils.DefaultResponse(c, 405)
+		utils.HTTPResponse(c, 405)
 	})
 
 	router.Use(ginRecovery.Recovery(func(c *gin.Context, serverErr interface{}) {
-		utils.DefaultResponse(c, 500)
+		utils.HTTPResponse(c, 500)
 	}))
 
 	if debug {

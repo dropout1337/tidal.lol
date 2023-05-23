@@ -10,24 +10,25 @@ import (
 func GetEmails(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	if token == "" {
-		utils.DefaultResponse(c, 401)
+		utils.HTTPResponse(c, 401)
 		return
 	}
 
 	query, err := database.DB.Query("SELECT * FROM mailbox WHERE token=$authorizationToken", map[string]any{"authorizationToken": token})
 	if err != nil {
-		utils.DefaultResponse(c, 500)
+		utils.HTTPResponse(c, 500)
 		return
 	}
+	result := utils.ToJson(query)
 
-	if len(query.([]interface{})[0].(map[string]interface{})["result"].([]interface{})) == 0 {
-		utils.DefaultResponse(c, 400, "mailbox not found")
+	if len(result.Get("0.result").Array()) == 0 {
+		utils.HTTPResponse(c, 400, "mailbox not found")
 		return
 	}
 
 	emails, err := database.DB.Query("SELECT * FROM inbox WHERE token=$authorizationToken", map[string]any{"authorizationToken": token})
 	if err != nil {
-		utils.DefaultResponse(c, 500)
+		utils.HTTPResponse(c, 500)
 		return
 	}
 
@@ -35,5 +36,5 @@ func GetEmails(c *gin.Context) {
 		delete(emails.([]interface{})[0].(map[string]interface{})["result"].([]interface{})[i].(map[string]interface{}), "token")
 	}
 
-	utils.DefaultResponse(c, 200, emails.([]interface{})[0].(map[string]interface{})["result"].([]interface{}))
+	utils.HTTPResponse(c, 200, emails.([]interface{})[0].(map[string]interface{})["result"].([]interface{}))
 }

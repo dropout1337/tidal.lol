@@ -17,28 +17,29 @@ func CreateMailBox(c *gin.Context) {
 	var data CreateMailBoxRequest
 
 	if err := c.ShouldBindJSON(&data); err != nil {
-		utils.DefaultResponse(c, 400)
+		utils.HTTPResponse(c, 400)
 		return
 	}
 
 	if len(data.Password) > 16 {
-		utils.DefaultResponse(c, 400, "password too long")
+		utils.HTTPResponse(c, 400, "password too long")
 		return
 	}
 
 	if len(data.Email) > 64 {
-		utils.DefaultResponse(c, 400, "email too long")
+		utils.HTTPResponse(c, 400, "email too long")
 		return
 	}
 
 	query, err := database.DB.Query("SELECT * FROM mailbox WHERE email=$email", map[string]any{"email": data.Email})
 	if err != nil {
-		utils.DefaultResponse(c, 500)
+		utils.HTTPResponse(c, 500)
 		return
 	}
+	result := utils.ToJson(query)
 
-	if len(query.([]interface{})[0].(map[string]interface{})["result"].([]interface{})) != 0 {
-		utils.DefaultResponse(c, 302, "mailbox already exists")
+	if len(result.Get("0.result").Array()) != 0 {
+		utils.HTTPResponse(c, 302, "mailbox already exists")
 		return
 	}
 
@@ -48,10 +49,11 @@ func CreateMailBox(c *gin.Context) {
 		"token":    uuid.NewString(),
 	})
 	if err != nil {
-		utils.DefaultResponse(c, 500)
+		utils.HTTPResponse(c, 500)
 		return
 	}
 
-	delete(mailbox.([]interface{})[0].(map[string]interface{}), "password")
-	utils.DefaultResponse(c, 200, mailbox)
+	utils.HTTPResponse(c, 200, map[string]string{
+		"token": utils.ToJson(mailbox).Get("0.token").String(),
+	})
 }

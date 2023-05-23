@@ -16,29 +16,30 @@ func DeleteMailBox(c *gin.Context) {
 	var data DeleteMailBoxRequest
 
 	if err := c.ShouldBindJSON(&data); err != nil {
-		utils.DefaultResponse(c, 400)
+		utils.HTTPResponse(c, 400)
 		return
 	}
 
 	query, err := database.DB.Query("SELECT * FROM mailbox WHERE id=$id", map[string]any{"id": data.ID})
 	if err != nil {
-		utils.DefaultResponse(c, 500)
+		utils.HTTPResponse(c, 500)
 		return
 	}
+	result := utils.ToJson(query)
 
-	if len(query.([]interface{})[0].(map[string]interface{})["result"].([]interface{})) == 0 {
-		utils.DefaultResponse(c, 404, "mailbox not found")
+	if len(result.Get("0.result").Array()) == 0 {
+		utils.HTTPResponse(c, 404, "mailbox not found")
 		return
-	} else if query.([]interface{})[0].(map[string]interface{})["result"].([]interface{})[0].(map[string]interface{})["password"] != data.Password {
-		utils.DefaultResponse(c, 401, "invalid password")
+	} else if result.Get("0.result.0.password").String() != data.Password {
+		utils.HTTPResponse(c, 401, "invalid password")
 		return
 	}
 
 	_, err = database.DB.Delete(data.ID)
 	if err != nil {
-		utils.DefaultResponse(c, 500)
+		utils.HTTPResponse(c, 500)
 		return
 	}
 
-	utils.DefaultResponse(c, 204)
+	utils.HTTPResponse(c, 204)
 }
