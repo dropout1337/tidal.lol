@@ -55,5 +55,6 @@ func CreateMailBox(c *gin.Context) {
 
 	utils.HTTPResponse(c, 200, map[string]string{
 		"token": utils.ToJson(mailbox).Get("0.token").String(),
+		"id":    utils.ToJson(mailbox).Get("0.id").String(),
 	})
 }
