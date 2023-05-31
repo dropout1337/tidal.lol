@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	_ "github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
 	"net/http"
 )
